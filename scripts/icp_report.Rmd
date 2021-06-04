@@ -1,0 +1,310 @@
+---
+title: "ICP summary for Roz"
+author: "Zach"
+date: "5/6/2021"
+always_allow_html: true
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# ICP data for Roz
+
+library(tidyverse);library(readxl);library(countrycode);library(GGally);library(kableExtra)
+
+wk_dir <- c("/Volumes/GoogleDrive/My Drive/BFA_Papers/BFA_Justice/section_model/aquatic_food_justice_model")
+
+exp_raw <- read.csv(
+  file.path(
+    wk_dir,"data","data_raw","world_bank_icp","national_data_request",
+    "disaggregated","icp_global_expenditure.csv"
+    ),
+  header=TRUE
+)
+
+ppp_raw <- read.csv(
+  file.path(
+    wk_dir,"data","data_raw","world_bank_icp","national_data_request",
+    "disaggregated","icp_global_ppp.csv"
+  ),
+  header=TRUE
+)
+
+rcp_fish_raw <- read.csv(  
+  file.path(
+    wk_dir,"data","data_raw","heady_alderman_rcp","Relative caloric price (RCP) of Fish_27-4-2021 19.2.csv"
+  ),
+  header=TRUE
+)
+rcp_white_meat_raw <- read.csv(  
+  file.path(
+    wk_dir,"data","data_raw","heady_alderman_rcp","Relative caloric price (RCP) of White meat_27-4-2021 19.3.csv"
+  ),
+  header=TRUE
+)
+
+# 1. Expenditure shares for fish/seafood and meat over time
+# for a set of countries in our regional analysis (up to 14 countries)
+# expenditure share of fish/seafood or meat as a % of total food expenditure, 
+# and the share of food to total (food+non-food) expenditure.
+# meat
+# 10+22+26+9+1+9
+# fish
+# 10+14+27+6+1+6
+fish_share_food_exp <- exp_raw %>%
+  filter(
+    Item.Code %in% c(1101100,1101130),
+    Year %in% c(2011,2017)
+  ) %>%
+  select(-Indicator.Code,-Item.Code,-Published.Unpublished,-Classification.Code) %>%
+  pivot_longer(
+    cols = AGO:TLS,names_to="iso_c3",values_to = "expenditure"
+  ) %>%
+  pivot_wider(names_from = Item.Name,values_from=expenditure) %>%
+  rename(
+    seafood_exp='Fish and seafood',
+    total_food_exp=FOOD
+  ) %>%
+  mutate(
+    seafood_share_food_exp=seafood_exp/total_food_exp,
+    country_name=countrycode(iso_c3,"iso3c","country.name.en")
+  ) %>%
+  select(country_name,iso_c3,Year,everything()
+         )
+# %>%
+#   pivot_wider(
+#     names_from = Year,values_from = c(seafood_exp,total_food_exp,seafood_share_food_exp)
+#   )
+
+meat_share_food_exp <- exp_raw %>%
+  filter(
+    Item.Code %in% c(1101100,1101120),
+    Year %in% c(2011,2017)
+  ) %>%
+  select(-Indicator.Code,-Item.Code,-Published.Unpublished,-Classification.Code) %>%
+  pivot_longer(
+    cols = AGO:TLS,names_to="iso_c3",values_to = "expenditure"
+  ) %>%
+  pivot_wider(names_from = Item.Name,values_from=expenditure) %>%
+  rename(
+    meat_exp='Meat',
+    total_food_exp=FOOD
+  ) %>%
+  mutate(
+    meat_share_food_exp=meat_exp/total_food_exp,
+    country_name=countrycode(iso_c3,"iso3c","country.name.en")
+  ) %>%
+  select(country_name,iso_c3,Year,everything()
+         )
+
+
+food_share_total_exp <- exp_raw %>%
+  filter(
+    Item.Code %in% c(
+      1101100,1101000,1102000,
+      1103000,1105000,1107000,
+      1108000,1111000,1113000,
+      1501000,1502000,1503000
+      ),
+    Year %in% c(2011,2017)
+  ) %>%
+  select(-Indicator.Code,-Item.Code,-Published.Unpublished,-Classification.Code) %>%
+  pivot_longer(
+    cols = AGO:TLS,names_to="iso_c3",values_to = "expenditure"
+  ) %>%
+  pivot_wider(names_from = Item.Name,values_from=expenditure) %>%
+  dplyr::select(Year, iso_c3,FOOD,everything()) %>%
+  mutate(
+    all_food_nonfood_exp=rowSums(
+      across(
+        'FOOD AND NON-ALCOHOLIC BEVERAGES':"ACQUISITIONS LESS DISPOSALS OF VALUABLES (Category)"
+      )
+    ),
+    food_share_total_exp=FOOD/all_food_nonfood_exp,
+    country_name=countrycode(iso_c3,"iso3c","country.name.en")
+  ) %>%
+  dplyr::select(
+    country_name,iso_c3,Year,FOOD,all_food_nonfood_exp,food_share_total_exp,everything()
+                )
+
+
+
+ppp_fish_meat <- ppp_raw %>%
+  filter(
+    Item.Code %in% c(1101120,1101130),
+    Year %in% c(2011,2017)
+  ) %>%
+  select(-Indicator.Code,-Item.Code,-Published.Unpublished,-Classification.Code) %>%
+  mutate(across(AGO:TLS,as.numeric)) %>%
+  pivot_longer(
+    cols = AGO:TLS,names_to="iso_c3",values_to = "ppp"
+  ) %>%
+  # pivot_wider(names_from = Item.Name,values_from=ppp) %>%
+  # rename(
+  #   seafood_ppp='Fish and seafood',
+  #   meat_ppp='Meat'
+  # ) %>%
+  mutate(
+    # seafood_share_food_exp=seafood_exp/total_food_exp,
+    country_name=countrycode(iso_c3,"iso3c","country.name.en")
+  ) %>%
+  select(country_name,iso_c3,Year,everything()
+         )
+
+
+
+exp_fish_meat <- exp_raw %>%
+  filter(
+    Item.Code %in% c(1101120,1101130),
+    Year %in% c(2011,2017)
+  ) %>%
+  select(-Indicator.Code,-Item.Code,-Published.Unpublished,-Classification.Code) %>%
+  mutate(across(AGO:TLS,as.numeric)) %>%
+  pivot_longer(
+    cols = AGO:TLS,names_to="iso_c3",values_to = "exp"
+  ) %>%
+  # pivot_wider(names_from = Item.Name,values_from=exp) %>%
+  # rename(
+  #   seafood_exp='Fish and seafood',
+  #   meat_exp='Meat'
+  # ) %>%
+  mutate(
+    # seafood_share_food_exp=seafood_exp/total_food_exp,
+    country_name=countrycode(iso_c3,"iso3c","country.name.en")
+  ) %>%
+  select(country_name,iso_c3,Year,everything()
+         )
+  
+
+
+```
+
+## PPP comparison between meat and fish
+
+PPP data is hard to visualise in a plot due to countries like Chile and Nigeria having VERY high PPP values relative to the other countries, so it has been included as a table here. Note the US down at the bottom has values of 1. I believe this due to the fact that they use the US values to standardize all the other country prices.
+
+Fish has, across the board, become far more expensive between 2011 and 2017, this is especially true in Ghana (3x increase), but also in Nigeria and India (just under 2x). Meat prices are a bit more steady, and unlike seafood have actually dropped in a few instances (France, Chile and Spain). 
+
+```{r echo=FALSE}
+ppp_subset <- ppp_fish_meat %>%
+  filter(iso_c3 %in% c('CHN','IND','NGA','GHA','FRA','ESP','USA','MEX','BRA','PER')) %>%
+  pivot_wider(names_from = Year,values_from = ppp) %>%
+  rename(
+    ppp_2017='2017',
+    ppp_2011='2011'
+  ) %>%
+  select(country_name,Item.Name,ppp_2011,ppp_2017) %>%
+  arrange(country_name)
+
+ppp_table <- ppp_subset %>%
+  mutate(
+    percent_change=ppp_2017/ppp_2011,
+    percent_change=format(round(percent_change, 2), nsmall = 2),
+    ppp_2017=format(round(ppp_2017, 2), nsmall = 2),
+    ppp_2011=format(round(ppp_2011, 2), nsmall = 2)
+    # percent_change=cell_spec(percent_change,color= ifelse(percent_change <1,"blue","red"))
+    )%>%
+  select(-country_name) %>%
+  kable(booktabs=TRUE) %>% 
+  # kable_styling(full_width=TRUE) %>%
+  pack_rows(
+  index=c('Brazil'=2,'China'=2,'France'=2,'Ghana'=2,'India'=2,'Mexico'=2,'Nigeria'=2,'Peru'=2,'Spain'=2,'United States'=2)
+)
+ppp_table
+# ppp_bar_2011 <- ppp_subset  %>% 
+#   filter(Year==2011) %>%
+#   ggplot(aes(x=as.factor(country_name),y=log(ppp),fill=Item.Name)) + 
+#   geom_bar(stat = 'identity',position='dodge')
+# 
+# ppp_subset  %>% 
+#   ggplot(aes(x=as.factor(Year),y=ppp,color=Item.Name,group=country_name)) + 
+#   geom_path(stat='identity') +
+#   geom_line() +
+#   geom_point()
+
+```
+
+
+Out of curiosity, I also created a table based on ICPs expenditure data coming from National Accounts Expenditures (local currency unit, at CURRENT prices) instead of values standardized to USD. The values themselves are not comparable across countries, BUT the percent change in price [I think] should be. Here we see the expenditure of all meats going up, and in this case meat expenditures were increasing faster than fish in China, India, Spain and the US. There were near 2x increases in meat expenditures for  Brazil, Chile (Fish), China (Meat), Ghana, India, Mexico, and Nigeria.
+
+This data is 
+
+```{r echo=FALSE}
+exp_subset <- exp_fish_meat %>%
+  filter(iso_c3 %in% c('CHN','IND','NGA','GHA','FRA','ESP','USA','MEX','BRA','PER','CHL')) %>%
+  pivot_wider(names_from = Year,values_from = exp) %>%
+  rename(
+    exp_2017='2017',
+    exp_2011='2011'
+  ) %>%
+  select(country_name,Item.Name,exp_2011,exp_2017) %>%
+  arrange(country_name)
+
+exp_table <- exp_subset %>%
+  mutate(
+    percent_change=exp_2017/exp_2011
+    # ,
+    # percent_change=cell_spec(percent_change,color= ifelse(percent_change <1,"blue","red"))
+    )%>%
+  select(-country_name) %>%
+  kable(booktabs=TRUE) %>% 
+  # kable_styling(full_width=TRUE) %>%
+  pack_rows(
+  index=c('Brazil'=2,'Chile'=2,'China'=2,'France'=2,'Ghana'=2,'India'=2,'Mexico'=2,'Nigeria'=2,'Peru'=2,'Spain'=2,'United States'=2)
+)
+exp_table
+# exp_bar_2011 <- exp_subset  %>% 
+#   filter(Year==2011) %>%
+#   ggplot(aes(x=as.factor(country_name),y=log(exp),fill=Item.Name)) + 
+#   geom_bar(stat = 'identity',position='dodge')
+# 
+# exp_subset  %>% 
+#   ggplot(aes(x=as.factor(Year),y=exp,color=Item.Name,group=country_name)) + 
+#   geom_path(stat='identity') +
+#   geom_line() +
+#   geom_point()
+
+```
+
+## Comparing the Relative Caloric Price for Fish to White meat
+Using H-A data, there is a low global correlation between the prices of white meat (aka poultry) and fish. However, when looking by region, some trends do arise. For example, Africa has relatively higher prices for poultry than it does for fish, and for both poultry and fish, the RCP values are quite high in the region. It looks like most countries in the Americas have higher prices for fish than they do for poultry, and that the RCP for these wealthier (on average) regions tends to be lower compared to Africa. Asian countries tended to have generally low RCP values, with fish looking to be slightly more affordable. 
+
+```{r  echo=FALSE,warning=FALSE}
+  rcp_fish_raw$category <- "Fish"
+  rcp_white_meat_raw$category <- "Poultry"
+  
+  rcp_clean <- rbind(rcp_fish_raw,rcp_white_meat_raw) %>%
+  rename(country_name=AreaName,iso_c3=AreaID,RCP=DataValue) %>%
+  select(country_name,category,iso_c3,RCP,RCP) 
+  
+  rcp_clean_wide <- pivot_wider(rcp_clean,names_from = category,values_from = RCP) %>%
+      mutate(
+        region=countrycode(iso_c3,"iso3c","un.region.name")
+      ) %>%
+    drop_na(region)
+  
+  rcp_corel <- round(cor(rcp_clean_wide$Fish,rcp_clean_wide$Poultry),3)
+  
+  rcp_clean_wide %>%
+    mutate(difference=abs(Fish-Poultry)) %>%
+  filter(iso_c3 %in% c('CHN','IND','NGA','GHA','FRA','ESP','USA','MEX','BRA','PER','CHL')) %>%
+    select(-iso_c3,-region)
+  
+  
+  rcp_clean_wide %>%
+    ggplot(aes(x=Fish,y=Poultry,color=region)) +
+      geom_point() +
+      xlim(0,25) + 
+      ylim(0,25) +
+    geom_abline(intercept=0) +
+    geom_label(color="black",x=20,y=25,label=paste0("correlation: ",rcp_corel)) +
+    ggtitle("RCP of Fish to Poultry") +
+    theme_bw()
+  
+  
+```
+
+
