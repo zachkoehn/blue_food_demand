@@ -1,0 +1,81 @@
+﻿country_name,Import,Export,category
+China,"3,970,046","7,995,396",All fish trade
+India,"42,787","1,084,313",All fish trade
+Nigeria,"686,782","6,659",All fish trade
+Ghana,"406,012","43,060",All fish trade
+Brazil,"642,405","48,092",All fish trade
+Peru,"152,454","446,474",All fish trade
+France,"1,894,412","372,763",All fish trade
+Spain,"2,135,873","1,281,623",All fish trade
+US,"5,210,866","1,921,633",All fish trade
+Mexico,"520,237","163,795",All fish trade
+China,6151.72,1555.17,Pelagic fish trade
+India,128.7,259.52,Pelagic fish trade
+Nigeria,659.5,0,Pelagic fish trade
+Ghana,387.18,59.65,Pelagic fish trade
+Brazil,126.99,58.7,Pelagic fish trade
+Peru,139,2828.51,Pelagic fish trade
+France,530.56,209.61,Pelagic fish trade
+Spain,739.35,710.48,Pelagic fish trade
+US,774.11,576.4,Pelagic fish trade
+Mexico,142.3,224.8,Pelagic fish trade
+China,482.15,1146.16,Freshwater fish trade
+India,13.49,40.64,Freshwater fish trade
+Nigeria,2.12,0,Freshwater fish trade
+Ghana,1.86,0.02,Freshwater fish trade
+Brazil,187.94,2.6,Freshwater fish trade
+Peru,13.41,9.83,Freshwater fish trade
+France,269.73,53.34,Freshwater fish trade
+Spain,178.82,36.7,Freshwater fish trade
+US,1505.99,302.13,Freshwater fish trade
+Mexico,318.06,7.93,Freshwater fish trade
+China,486.12,826.89,Crustacean trade
+India,1.72,479.53,Crustacean trade
+Nigeria,0.12,6.66,Crustacean trade
+Ghana,0.08,0.26,Crustacean trade
+Brazil,2.97,3.55,Crustacean trade
+Peru,3.75,23.15,Crustacean trade
+France,262.92,34.11,Crustacean trade
+Spain,212.15,66.01,Crustacean trade
+US,1687.07,141.21,Crustacean trade
+Mexico,40.79,36.17,Crustacean trade
+China,1216.03,1557.12,Bivalves trade
+India,0.25,20.01,Bivalves trade
+Nigeria,0.04,0,Bivalves trade
+Ghana,0.01,0,Bivalves trade
+Brazil,5.07,0,Bivalves trade
+Peru,0.47,5.74,Bivalves trade
+France,230.47,42.98,Bivalves trade
+Spain,279.22,129.88,Bivalves trade
+US,473.19,84.2,Bivalves trade
+Mexico,15.71,7,Bivalves trade
+China,227.94,647.15,Cephalopods trade
+India,0.17,170.26,Cephalopods trade
+Nigeria,0,0,Cephalopods trade
+Ghana,0.02,0.15,Cephalopods trade
+Brazil,8.21,0.02,Cephalopods trade
+Peru,0.95,270.43,Cephalopods trade
+France,42.91,19.83,Cephalopods trade
+Spain,240.81,158.48,Cephalopods trade
+US,99.77,60.51,Cephalopods trade
+Mexico,14.2,10.99,Cephalopods trade
+China,570.94,1835.69,Other marine fish trade
+India,12.3,9.57,Other marine fish trade
+Nigeria,9.54,0,Other marine fish trade
+Ghana,7.91,2.46,Other marine fish trade
+Brazil,45.12,8.95,Other marine fish trade
+Peru,6.84,0.1,Other marine fish trade
+France,18.24,9.74,Other marine fish trade
+Spain,82.72,39.08,Other marine fish trade
+US,0,0,Other marine fish trade
+Mexico,18.61,31.56,Other marine fish trade
+China,1588.61,1269.07,Demersal fish trade
+India,0.2,244.8,Demersal fish trade
+Nigeria,83.81,0,Demersal fish trade
+Ghana,10.22,8.72,Demersal fish trade
+Brazil,285.81,17.74,Demersal fish trade
+Peru,6.75,54.52,Demersal fish trade
+France,673.32,76.96,Demersal fish trade
+Spain,594.23,290.86,Demersal fish trade
+US,820.73,1267.5,Demersal fish trade
+Mexico,10.75,8.45,Demersal fish trade
